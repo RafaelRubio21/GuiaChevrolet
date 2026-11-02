@@ -3,10 +3,20 @@ package com.guiachevrolet.data.local
 import com.guiachevrolet.data.local.entity.ErrorCodeEntity
 import com.guiachevrolet.data.local.entity.Severity
 import com.guiachevrolet.data.local.entity.VehicleEntity
+import com.guiachevrolet.data.local.entity.VehicleManualEntity
 
 object PrepopulateData {
 
     private val allModels = VehicleEntity.SUPPORTED_GM_MODELS
+
+    val initialVehicleManuals: List<VehicleManualEntity> =
+        VehicleEntity.MANUAL_URL_BY_MODEL.map { (model, url) ->
+            VehicleManualEntity(
+                model = model,
+                title = "Manual do Proprietário Chevrolet $model",
+                pdfUrl = url
+            )
+        }
 
     val initialErrorCodes = listOf(
         ErrorCodeEntity(

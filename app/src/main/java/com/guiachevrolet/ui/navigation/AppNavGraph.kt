@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -18,9 +19,11 @@ import androidx.navigation.navArgument
 import com.guiachevrolet.data.repository.ChevroletRepository
 import com.guiachevrolet.ui.screens.ErrorLookupScreen
 import com.guiachevrolet.ui.screens.HomeScreen
+import com.guiachevrolet.ui.screens.ManualPdfScreen
 import com.guiachevrolet.ui.screens.OnboardingScreen
 import com.guiachevrolet.ui.screens.VehicleManagementScreen
 import com.guiachevrolet.ui.viewmodel.ErrorLookupViewModel
+import com.guiachevrolet.ui.viewmodel.ManualViewerViewModel
 import com.guiachevrolet.ui.viewmodel.StartupDestination
 import com.guiachevrolet.ui.viewmodel.VehicleViewModel
 
@@ -29,8 +32,10 @@ object Routes {
     const val HOME = "home"
     const val MANAGE_VEHICLES = "manage_vehicles"
     const val LOOKUP = "lookup/{vehicleId}"
+    const val MANUAL = "manual/{vehicleId}"
 
     fun lookupRoute(vehicleId: Long) = "lookup/$vehicleId"
+    fun manualRoute(vehicleId: Long) = "manual/$vehicleId"
 }
 
 @Composable
@@ -86,6 +91,9 @@ fun AppNavGraph(
                 },
                 onNavigateToLookup = { vehicleId ->
                     navController.navigate(Routes.lookupRoute(vehicleId))
+                },
+                onNavigateToManual = { vehicleId ->
+                    navController.navigate(Routes.manualRoute(vehicleId))
                 }
             )
         }
@@ -126,7 +134,39 @@ fun AppNavGraph(
                 onCodeInputChange = lookupViewModel::onCodeInputChange,
                 onClearClick = lookupViewModel::clearCodeInput,
                 onSearchClick = { lookupViewModel.searchCode() },
-                onQuickCodeClick = { quickCode -> lookupViewModel.searchCode(overrideCode = quickCode) }
+                onQuickCodeClick = { quickCode -> lookupViewModel.searchCode(overrideCode = quickCode) },
+                onOpenManualClick = {
+                    navController.navigate(Routes.manualRoute(vehicleId))
+                }
+            )
+        }
+
+        composable(
+            route = Routes.MANUAL,
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            val context = LocalContext.current
+            val manualViewModel: ManualViewerViewModel = viewModel(
+                factory = ManualViewerViewModel.provideFactory(repository)
+            )
+            val uiState by manualViewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(vehicleId) {
+                manualViewModel.loadManualForVehicle(context.applicationContext, vehicleId)
+            }
+
+            ManualPdfScreen(
+                uiState = uiState,
+                onBack = { navController.popBackStack() },
+                onRetry = {
+                    manualViewModel.loadManualForVehicle(
+                        context = context.applicationContext,
+                        vehicleId = vehicleId,
+                        forceRedownload = true
+                    )
+                },
+                renderPage = manualViewModel::renderPage
             )
         }
     }

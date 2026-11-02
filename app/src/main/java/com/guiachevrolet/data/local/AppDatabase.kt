@@ -8,15 +8,21 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.guiachevrolet.data.local.dao.ErrorCodeDao
 import com.guiachevrolet.data.local.dao.VehicleDao
+import com.guiachevrolet.data.local.dao.VehicleManualDao
 import com.guiachevrolet.data.local.entity.ErrorCodeEntity
 import com.guiachevrolet.data.local.entity.VehicleEntity
+import com.guiachevrolet.data.local.entity.VehicleManualEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [VehicleEntity::class, ErrorCodeEntity::class],
-    version = 1,
+    entities = [
+        VehicleEntity::class,
+        ErrorCodeEntity::class,
+        VehicleManualEntity::class
+    ],
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -24,6 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun vehicleDao(): VehicleDao
     abstract fun errorCodeDao(): ErrorCodeDao
+    abstract fun vehicleManualDao(): VehicleManualDao
 
     companion object {
         @Volatile
@@ -53,6 +60,7 @@ abstract class AppDatabase : RoomDatabase() {
             INSTANCE?.let { database ->
                 scope.launch(Dispatchers.IO) {
                     database.errorCodeDao().insertAll(PrepopulateData.initialErrorCodes)
+                    database.vehicleManualDao().insertAll(PrepopulateData.initialVehicleManuals)
                 }
             }
         }

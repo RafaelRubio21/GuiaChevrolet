@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AssistChip
@@ -32,6 +33,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,6 +68,7 @@ import com.guiachevrolet.ui.theme.SeverityMaintBg
 import com.guiachevrolet.ui.theme.SeverityMaintColor
 import com.guiachevrolet.ui.viewmodel.LookupResultState
 import com.guiachevrolet.ui.viewmodel.LookupUiState
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -74,12 +78,19 @@ fun ErrorLookupScreen(
     onCodeInputChange: (String) -> Unit,
     onClearClick: () -> Unit,
     onSearchClick: () -> Unit,
-    onQuickCodeClick: (Int) -> Unit
+    onQuickCodeClick: (Int) -> Unit,
+    onOpenManualClick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val codeInputFocusRequester = remember { FocusRequester() }
     val activeVehicle = uiState.activeVehicle
+
+    LaunchedEffect(Unit) {
+        delay(150)
+        codeInputFocusRequester.requestFocus()
+        keyboardController?.show()
+    }
 
     Scaffold(
         topBar = {
@@ -109,40 +120,68 @@ fun ErrorLookupScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Cabeçalho com veículo ativo
+            // Cabeçalho com veículo ativo + botão Ver Manual em PDF
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
+                Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.DirectionsCar,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DirectionsCar,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = if (activeVehicle != null) {
+                                    "Consultando para: ${activeVehicle.model} ${activeVehicle.year}"
+                                } else {
+                                    "Carregando veículo..."
+                                },
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            if (!activeVehicle?.nickname.isNullOrBlank()) {
+                                Text(
+                                    text = "Veículo: ${activeVehicle?.nickname}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                )
+                            }
+                        }
+                    }
+
+                    FilledTonalButton(
+                        onClick = {
+                            focusManager.clearFocus()
+                            onOpenManualClick()
+                        },
+                        enabled = activeVehicle != null,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MenuBook,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = if (activeVehicle != null) {
-                                "Consultando para: ${activeVehicle.model} ${activeVehicle.year}"
+                                "Ver Manual do ${activeVehicle.model} em PDF (No App)"
                             } else {
-                                "Carregando veículo..."
+                                "Ver Manual em PDF"
                             },
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            fontWeight = FontWeight.SemiBold
                         )
-                        if (!activeVehicle?.nickname.isNullOrBlank()) {
-                            Text(
-                                text = "Veículo: ${activeVehicle?.nickname}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                            )
-                        }
                     }
                 }
             }
@@ -301,7 +340,11 @@ fun ErrorLookupScreen(
                 is LookupResultState.NotFound -> {
                     NotFoundResultCard(
                         searchedCode = result.searchedCode,
-                        vehicleModel = result.vehicleModel
+                        vehicleModel = result.vehicleModel,
+                        onOpenManualClick = {
+                            focusManager.clearFocus()
+                            onOpenManualClick()
+                        }
                     )
                 }
             }
@@ -397,7 +440,8 @@ private fun ErrorCodeResultCard(errorCode: ErrorCodeEntity) {
 @Composable
 private fun NotFoundResultCard(
     searchedCode: Int,
-    vehicleModel: String
+    vehicleModel: String,
+    onOpenManualClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -409,7 +453,7 @@ private fun NotFoundResultCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -431,10 +475,19 @@ private fun NotFoundResultCard(
             )
 
             Text(
-                text = "Sugestão: Verifique se o número foi digitado corretamente ou consulte o Manual do Proprietário do seu veículo e uma concessionária/oficina especializada.",
+                text = "Sugestão: Verifique se o número foi digitado corretamente ou consulte diretamente o Manual do Proprietário em PDF aqui no aplicativo.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            OutlinedButton(
+                onClick = onOpenManualClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(imageVector = Icons.Default.MenuBook, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Abrir Manual do $vehicleModel em PDF", fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }

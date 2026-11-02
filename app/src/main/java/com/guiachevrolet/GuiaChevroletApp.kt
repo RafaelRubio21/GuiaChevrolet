@@ -19,7 +19,8 @@ class GuiaChevroletApp : Application() {
     val repository: ChevroletRepository by lazy {
         ChevroletRepository(
             vehicleDao = database.vehicleDao(),
-            errorCodeDao = database.errorCodeDao()
+            errorCodeDao = database.errorCodeDao(),
+            vehicleManualDao = database.vehicleManualDao()
         )
     }
 

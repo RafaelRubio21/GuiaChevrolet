@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -25,6 +26,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -51,7 +53,8 @@ import com.guiachevrolet.data.local.entity.VehicleEntity
 fun HomeScreen(
     vehicles: List<VehicleEntity>,
     onNavigateToManageVehicles: () -> Unit,
-    onNavigateToLookup: (vehicleId: Long) -> Unit
+    onNavigateToLookup: (vehicleId: Long) -> Unit,
+    onNavigateToManual: (vehicleId: Long) -> Unit
 ) {
     var showVehicleSelectorSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -128,7 +131,8 @@ fun HomeScreen(
                         items(vehicles, key = { it.id }) { vehicle ->
                             VehicleHeaderCard(
                                 vehicle = vehicle,
-                                onClick = { onNavigateToLookup(vehicle.id) }
+                                onClick = { onNavigateToLookup(vehicle.id) },
+                                onManualClick = { onNavigateToManual(vehicle.id) }
                             )
                         }
                     }
@@ -245,7 +249,8 @@ fun HomeScreen(
 @Composable
 private fun VehicleHeaderCard(
     vehicle: VehicleEntity,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onManualClick: () -> Unit
 ) {
     Card(
         onClick = onClick,
@@ -291,6 +296,14 @@ private fun VehicleHeaderCard(
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            IconButton(onClick = onManualClick) {
+                Icon(
+                    imageVector = Icons.Default.MenuBook,
+                    contentDescription = "Ver Manual em PDF",
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
 
