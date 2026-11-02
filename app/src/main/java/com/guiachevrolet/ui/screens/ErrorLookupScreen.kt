@@ -43,10 +43,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -73,6 +77,8 @@ fun ErrorLookupScreen(
     onQuickCodeClick: (Int) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val codeInputFocusRequester = remember { FocusRequester() }
     val activeVehicle = uiState.activeVehicle
 
     Scaffold(
@@ -150,7 +156,13 @@ fun ErrorLookupScreen(
                 singleLine = true,
                 trailingIcon = {
                     if (uiState.codeInput.isNotEmpty()) {
-                        IconButton(onClick = onClearClick) {
+                        IconButton(
+                            onClick = {
+                                onClearClick()
+                                codeInputFocusRequester.requestFocus()
+                                keyboardController?.show()
+                            }
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
                                 contentDescription = "Limpar código"
@@ -168,7 +180,9 @@ fun ErrorLookupScreen(
                         onSearchClick()
                     }
                 ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(codeInputFocusRequester)
             )
 
             // Atalhos rápidos dos códigos mais comuns
@@ -201,8 +215,9 @@ fun ErrorLookupScreen(
             ) {
                 OutlinedButton(
                     onClick = {
-                        focusManager.clearFocus()
                         onClearClick()
+                        codeInputFocusRequester.requestFocus()
+                        keyboardController?.show()
                     },
                     enabled = uiState.codeInput.isNotEmpty() || uiState.resultState !is LookupResultState.Idle,
                     modifier = Modifier
