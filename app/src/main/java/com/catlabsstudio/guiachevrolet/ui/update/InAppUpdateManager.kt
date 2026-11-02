@@ -138,7 +138,7 @@ fun UpdateAvailableDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Uma versão mais recente do Guia Chevrolet está disponível na Google Play Store.",
+                    text = "Uma versão mais recente do Guia para Chevrolet está disponível na Google Play Store.",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(

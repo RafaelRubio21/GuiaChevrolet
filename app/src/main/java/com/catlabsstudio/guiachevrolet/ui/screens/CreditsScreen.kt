@@ -144,16 +144,23 @@ fun CreditsScreen(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                     Text(
-                        text = "Guia Chevrolet • Diagnóstico de Painel & Manuais GM",
+                        text = "Guia para Chevrolet • Diagnóstico de Painel & Manuais GM",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center
                     )
 
                     Text(
-                        text = "Aplicativo desenvolvido com foco em praticidade, desempenho e consulta 100% offline para proprietários e entusiastas da linha Chevrolet.",
+                        text = "Aplicativo independente desenvolvido com foco em praticidade e consulta 100% offline para proprietários e entusiastas da linha Chevrolet.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Text(
+                        text = "Aviso: Este aplicativo não possui vínculo ou afiliação oficial com a General Motors (GM) ou Chevrolet.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
                         textAlign = TextAlign.Center
                     )
 

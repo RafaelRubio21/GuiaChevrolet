@@ -69,7 +69,7 @@ fun HomeScreen(
                 title = {
                     Column {
                         Text(
-                            text = "Guia Chevrolet",
+                            text = "Guia para Chevrolet",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )

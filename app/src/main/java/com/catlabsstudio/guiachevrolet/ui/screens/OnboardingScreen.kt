@@ -63,7 +63,7 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Bem-vindo ao Guia Chevrolet",
+                text = "Bem-vindo ao Guia para Chevrolet",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
