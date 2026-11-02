@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.guiachevrolet"
+    namespace = "com.catlabsstudio.guiachevrolet"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.guiachevrolet"
+        applicationId = "com.catlabsstudio.guiachevrolet"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
