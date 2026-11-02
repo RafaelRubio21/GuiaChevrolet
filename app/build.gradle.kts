@@ -75,5 +75,9 @@ dependencies {
     // Google AdMob (Anchored Adaptive Banner & Rewarded Ads)
     implementation(libs.play.services.ads)
 
+    // Google Play In-App Updates (Atualizações flexíveis e imediatas oficiais)
+    implementation(libs.google.app.update)
+    implementation(libs.google.app.update.ktx)
+
     debugImplementation(libs.androidx.ui.tooling)
 }

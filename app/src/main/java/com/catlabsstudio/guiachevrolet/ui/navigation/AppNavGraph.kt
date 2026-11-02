@@ -1,5 +1,7 @@
 package com.catlabsstudio.guiachevrolet.ui.navigation
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,6 +32,8 @@ import com.catlabsstudio.guiachevrolet.ui.screens.HomeScreen
 import com.catlabsstudio.guiachevrolet.ui.screens.ManualPdfScreen
 import com.catlabsstudio.guiachevrolet.ui.screens.OnboardingScreen
 import com.catlabsstudio.guiachevrolet.ui.screens.VehicleManagementScreen
+import com.catlabsstudio.guiachevrolet.ui.update.InAppUpdateManager
+import com.catlabsstudio.guiachevrolet.ui.update.UpdateAvailableDialog
 import com.catlabsstudio.guiachevrolet.ui.viewmodel.ErrorLookupViewModel
 import com.catlabsstudio.guiachevrolet.ui.viewmodel.ManualViewerViewModel
 import com.catlabsstudio.guiachevrolet.ui.viewmodel.StartupDestination
@@ -53,7 +57,18 @@ fun AppNavGraph(
 ) {
     val context = LocalContext.current
     val rewardedAdController = remember { RewardedManualAdController(context) }
+    val updateManager = remember { InAppUpdateManager(context) }
     var pendingManualVehicle by remember { mutableStateOf<VehicleEntity?>(null) }
+
+    val updateLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) {
+        updateManager.dismissDialog()
+    }
+
+    LaunchedEffect(Unit) {
+        updateManager.checkForAppUpdate()
+    }
 
     val vehicleViewModel: VehicleViewModel = viewModel(
         factory = VehicleViewModel.provideFactory(repository)
@@ -221,6 +236,19 @@ fun AppNavGraph(
                         pendingManualVehicle = null
                         navController.navigate(Routes.manualRoute(targetId))
                     }
+                )
+            }
+        )
+    }
+
+    // Modal de Notificação de Nova Versão Disponível na Google Play
+    if (updateManager.isUpdateAvailable) {
+        UpdateAvailableDialog(
+            onDismiss = { updateManager.dismissDialog() },
+            onUpdateClick = {
+                updateManager.startUpdateFlow(
+                    activity = context.findActivity(),
+                    updateLauncher = updateLauncher
                 )
             }
         )
