@@ -19,12 +19,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AssistChip
@@ -173,7 +173,7 @@ fun ErrorLookupScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(
-                            imageVector = Icons.Default.MenuBook,
+                            imageVector = Icons.AutoMirrored.Filled.MenuBook,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )
@@ -488,7 +488,7 @@ private fun NotFoundResultCard(
                 onClick = onOpenManualClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(imageVector = Icons.Default.MenuBook, contentDescription = null)
+                Icon(imageVector = Icons.AutoMirrored.Filled.MenuBook, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Abrir Manual do $vehicleModel em PDF", fontWeight = FontWeight.SemiBold)
             }

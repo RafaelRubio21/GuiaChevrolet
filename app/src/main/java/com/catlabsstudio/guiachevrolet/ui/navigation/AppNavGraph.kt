@@ -76,7 +76,7 @@ fun AppNavGraph(
     val navController = rememberNavController()
 
     fun requestOpenManual(vehicle: VehicleEntity) {
-        if (rewardedAdController.isManualUnlocked(vehicle.id)) {
+        if (rewardedAdController.isManualUnlocked(vehicle.model)) {
             navController.navigate(Routes.manualRoute(vehicle.id))
         } else {
             rewardedAdController.preloadAd()
@@ -205,7 +205,7 @@ fun AppNavGraph(
         }
     }
 
-    // Modal de confirmação do Anúncio Recompensado (Rewarded Ad) para desbloquear o PDF do manual
+    // Modal de confirmação do Anúncio Recompensado (Rewarded Ad) para desbloquear o PDF do manual por 7 dias
     pendingManualVehicle?.let { vehicleToUnlock ->
         UnlockManualRewardedDialog(
             vehicleModel = vehicleToUnlock.model,
@@ -213,11 +213,12 @@ fun AppNavGraph(
             onDismiss = { pendingManualVehicle = null },
             onWatchVideoClick = {
                 val targetId = vehicleToUnlock.id
-                pendingManualVehicle = null
+                val targetModel = vehicleToUnlock.model
                 rewardedAdController.showRewardedAd(
                     activity = context.findActivity(),
-                    vehicleId = targetId,
+                    vehicleModel = targetModel,
                     onUnlocked = {
+                        pendingManualVehicle = null
                         navController.navigate(Routes.manualRoute(targetId))
                     }
                 )
