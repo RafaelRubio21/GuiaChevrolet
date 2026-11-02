@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.guiachevrolet.data.repository.ChevroletRepository
+import com.guiachevrolet.ui.screens.CreditsScreen
 import com.guiachevrolet.ui.screens.ErrorLookupScreen
 import com.guiachevrolet.ui.screens.HomeScreen
 import com.guiachevrolet.ui.screens.ManualPdfScreen
@@ -33,6 +34,7 @@ object Routes {
     const val MANAGE_VEHICLES = "manage_vehicles"
     const val LOOKUP = "lookup/{vehicleId}"
     const val MANUAL = "manual/{vehicleId}"
+    const val CREDITS = "credits"
 
     fun lookupRoute(vehicleId: Long) = "lookup/$vehicleId"
     fun manualRoute(vehicleId: Long) = "manual/$vehicleId"
@@ -94,7 +96,16 @@ fun AppNavGraph(
                 },
                 onNavigateToManual = { vehicleId ->
                     navController.navigate(Routes.manualRoute(vehicleId))
+                },
+                onNavigateToCredits = {
+                    navController.navigate(Routes.CREDITS)
                 }
+            )
+        }
+
+        composable(Routes.CREDITS) {
+            CreditsScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 

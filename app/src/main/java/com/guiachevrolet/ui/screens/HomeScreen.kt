@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -34,6 +35,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -54,7 +56,8 @@ fun HomeScreen(
     vehicles: List<VehicleEntity>,
     onNavigateToManageVehicles: () -> Unit,
     onNavigateToLookup: (vehicleId: Long) -> Unit,
-    onNavigateToManual: (vehicleId: Long) -> Unit
+    onNavigateToManual: (vehicleId: Long) -> Unit,
+    onNavigateToCredits: () -> Unit
 ) {
     var showVehicleSelectorSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -73,6 +76,15 @@ fun HomeScreen(
                             text = "Diagnóstico Rápido de Painel GM",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToCredits) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Créditos",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 },
@@ -175,6 +187,23 @@ fun HomeScreen(
                     Text(
                         text = "Gerenciar Veículos",
                         style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                TextButton(
+                    onClick = onNavigateToCredits,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Créditos • CatLabs Studio",
+                        style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
