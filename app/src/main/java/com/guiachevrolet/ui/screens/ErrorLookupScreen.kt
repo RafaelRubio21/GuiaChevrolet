@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
@@ -34,6 +35,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -66,6 +68,7 @@ fun ErrorLookupScreen(
     uiState: LookupUiState,
     onBack: () -> Unit,
     onCodeInputChange: (String) -> Unit,
+    onClearClick: () -> Unit,
     onSearchClick: () -> Unit,
     onQuickCodeClick: (Int) -> Unit
 ) {
@@ -145,6 +148,16 @@ fun ErrorLookupScreen(
                 label = { Text("Código do painel (ex: 89)") },
                 placeholder = { Text("Digite o número exibido no painel") },
                 singleLine = true,
+                trailingIcon = {
+                    if (uiState.codeInput.isNotEmpty()) {
+                        IconButton(onClick = onClearClick) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Limpar código"
+                            )
+                        }
+                    }
+                },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Search
@@ -182,18 +195,38 @@ fun ErrorLookupScreen(
                 }
             }
 
-            Button(
-                onClick = {
-                    focusManager.clearFocus()
-                    onSearchClick()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(imageVector = Icons.Default.Search, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Consultar", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                OutlinedButton(
+                    onClick = {
+                        focusManager.clearFocus()
+                        onClearClick()
+                    },
+                    enabled = uiState.codeInput.isNotEmpty() || uiState.resultState !is LookupResultState.Idle,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(52.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Clear, contentDescription = null)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Limpar", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                }
+
+                Button(
+                    onClick = {
+                        focusManager.clearFocus()
+                        onSearchClick()
+                    },
+                    modifier = Modifier
+                        .weight(1.4f)
+                        .height(52.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Consultar", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                }
             }
 
             Spacer(modifier = Modifier.height(4.dp))

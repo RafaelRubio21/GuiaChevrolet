@@ -124,6 +124,7 @@ fun AppNavGraph(
                 uiState = uiState,
                 onBack = { navController.popBackStack() },
                 onCodeInputChange = lookupViewModel::onCodeInputChange,
+                onClearClick = lookupViewModel::clearCodeInput,
                 onSearchClick = { lookupViewModel.searchCode() },
                 onQuickCodeClick = { quickCode -> lookupViewModel.searchCode(overrideCode = quickCode) }
             )

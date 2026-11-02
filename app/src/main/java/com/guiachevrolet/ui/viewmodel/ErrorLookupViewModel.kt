@@ -57,6 +57,15 @@ class ErrorLookupViewModel(
         }
     }
 
+    fun clearCodeInput() {
+        _uiState.update {
+            it.copy(
+                codeInput = "",
+                resultState = LookupResultState.Idle
+            )
+        }
+    }
+
     fun searchCode(overrideCode: Int? = null) {
         val currentState = _uiState.value
         val vehicle = currentState.activeVehicle ?: return
