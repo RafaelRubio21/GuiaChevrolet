@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.catlabsstudio.guiachevrolet.data.local.entity.VehicleEntity
+import com.catlabsstudio.guiachevrolet.ui.ads.AnchoredAdaptiveBanner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,6 +94,9 @@ fun HomeScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
+        },
+        bottomBar = {
+            AnchoredAdaptiveBanner()
         }
     ) { innerPadding ->
         Column(

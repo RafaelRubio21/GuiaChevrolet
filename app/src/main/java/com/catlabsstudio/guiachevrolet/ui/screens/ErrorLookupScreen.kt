@@ -60,6 +60,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.catlabsstudio.guiachevrolet.data.local.entity.ErrorCodeEntity
 import com.catlabsstudio.guiachevrolet.data.local.entity.Severity
+import com.catlabsstudio.guiachevrolet.ui.ads.AnchoredAdaptiveBanner
 import com.catlabsstudio.guiachevrolet.ui.theme.SeverityAlertBg
 import com.catlabsstudio.guiachevrolet.ui.theme.SeverityAlertColor
 import com.catlabsstudio.guiachevrolet.ui.theme.SeverityCriticalBg
@@ -110,6 +111,9 @@ fun ErrorLookupScreen(
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
+        },
+        bottomBar = {
+            AnchoredAdaptiveBanner()
         }
     ) { innerPadding ->
         Column(

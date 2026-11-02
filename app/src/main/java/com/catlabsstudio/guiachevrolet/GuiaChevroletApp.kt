@@ -3,6 +3,7 @@ package com.catlabsstudio.guiachevrolet
 import android.app.Application
 import com.catlabsstudio.guiachevrolet.data.local.AppDatabase
 import com.catlabsstudio.guiachevrolet.data.repository.ChevroletRepository
+import com.google.android.gms.ads.MobileAds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -27,6 +28,7 @@ class GuiaChevroletApp : Application() {
     override fun onCreate() {
         super.onCreate()
         applicationScope.launch {
+            MobileAds.initialize(this@GuiaChevroletApp)
             repository.ensureSeeded()
         }
     }

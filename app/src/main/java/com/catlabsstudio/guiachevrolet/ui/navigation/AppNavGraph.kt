@@ -6,6 +6,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -16,7 +19,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.catlabsstudio.guiachevrolet.data.local.entity.VehicleEntity
 import com.catlabsstudio.guiachevrolet.data.repository.ChevroletRepository
+import com.catlabsstudio.guiachevrolet.ui.ads.RewardedManualAdController
+import com.catlabsstudio.guiachevrolet.ui.ads.UnlockManualRewardedDialog
+import com.catlabsstudio.guiachevrolet.ui.ads.findActivity
 import com.catlabsstudio.guiachevrolet.ui.screens.CreditsScreen
 import com.catlabsstudio.guiachevrolet.ui.screens.ErrorLookupScreen
 import com.catlabsstudio.guiachevrolet.ui.screens.HomeScreen
@@ -44,6 +51,10 @@ object Routes {
 fun AppNavGraph(
     repository: ChevroletRepository
 ) {
+    val context = LocalContext.current
+    val rewardedAdController = remember { RewardedManualAdController(context) }
+    var pendingManualVehicle by remember { mutableStateOf<VehicleEntity?>(null) }
+
     val vehicleViewModel: VehicleViewModel = viewModel(
         factory = VehicleViewModel.provideFactory(repository)
     )
@@ -63,6 +74,15 @@ fun AppNavGraph(
     }
 
     val navController = rememberNavController()
+
+    fun requestOpenManual(vehicle: VehicleEntity) {
+        if (rewardedAdController.isManualUnlocked(vehicle.id)) {
+            navController.navigate(Routes.manualRoute(vehicle.id))
+        } else {
+            rewardedAdController.preloadAd()
+            pendingManualVehicle = vehicle
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -95,7 +115,9 @@ fun AppNavGraph(
                     navController.navigate(Routes.lookupRoute(vehicleId))
                 },
                 onNavigateToManual = { vehicleId ->
-                    navController.navigate(Routes.manualRoute(vehicleId))
+                    vehicles.firstOrNull { it.id == vehicleId }?.let { vehicle ->
+                        requestOpenManual(vehicle)
+                    }
                 },
                 onNavigateToCredits = {
                     navController.navigate(Routes.CREDITS)
@@ -147,7 +169,9 @@ fun AppNavGraph(
                 onSearchClick = { lookupViewModel.searchCode() },
                 onQuickCodeClick = { quickCode -> lookupViewModel.searchCode(overrideCode = quickCode) },
                 onOpenManualClick = {
-                    navController.navigate(Routes.manualRoute(vehicleId))
+                    uiState.activeVehicle?.let { vehicle ->
+                        requestOpenManual(vehicle)
+                    }
                 }
             )
         }
@@ -157,7 +181,6 @@ fun AppNavGraph(
             arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
         ) { backStackEntry ->
             val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
-            val context = LocalContext.current
             val manualViewModel: ManualViewerViewModel = viewModel(
                 factory = ManualViewerViewModel.provideFactory(repository)
             )
@@ -180,5 +203,25 @@ fun AppNavGraph(
                 renderPage = manualViewModel::renderPage
             )
         }
+    }
+
+    // Modal de confirmação do Anúncio Recompensado (Rewarded Ad) para desbloquear o PDF do manual
+    pendingManualVehicle?.let { vehicleToUnlock ->
+        UnlockManualRewardedDialog(
+            vehicleModel = vehicleToUnlock.model,
+            isLoadingAd = rewardedAdController.isLoadingAd,
+            onDismiss = { pendingManualVehicle = null },
+            onWatchVideoClick = {
+                val targetId = vehicleToUnlock.id
+                pendingManualVehicle = null
+                rewardedAdController.showRewardedAd(
+                    activity = context.findActivity(),
+                    vehicleId = targetId,
+                    onUnlocked = {
+                        navController.navigate(Routes.manualRoute(targetId))
+                    }
+                )
+            }
+        )
     }
 }

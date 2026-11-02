@@ -62,5 +62,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // Google AdMob (Anchored Adaptive Banner & Rewarded Ads)
+    implementation(libs.play.services.ads)
+
     debugImplementation(libs.androidx.ui.tooling)
 }
